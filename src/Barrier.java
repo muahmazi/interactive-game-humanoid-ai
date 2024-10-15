@@ -12,13 +12,20 @@ public class Barrier {
             return true;
         }
         return false;
-        
+
     }
 
-    public void drawDebug(Graphics2D g, int viewportX, int viewportY) {
-        g.setColor(new Color(255, 0, 0, 128)); // Semi-transparent red for debugging
+    public void drawDebug(Graphics2D g, int viewportX, int viewportY, Color color) {
+        g.setColor(color);
         g.fillRect(rectangle.x - viewportX, rectangle.y - viewportY, rectangle.width, rectangle.height);
     }
-    
-}
 
+    public int getX() {
+        return (int) rectangle.getMinX();
+    }
+
+    public int getY() {
+        return (int) rectangle.getMinY();
+    }
+
+}
