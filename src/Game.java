@@ -91,6 +91,8 @@ public class Game extends JPanel implements ActionListener, MouseListener {
         messageLabel = new JLabel("Welcome to RoboHeist!"); // initial welcome message
         messageLabel.setHorizontalAlignment(SwingConstants.CENTER); // center align the message
         messageLabel.setPreferredSize(new Dimension(800, 200)); // set preferred size for the label
+        Font font = new Font("Arial", Font.BOLD, 24);
+        messageLabel.setFont(font); // set the font for the messageLabel
     }
 
     // method to update the "camera" view based on player position
@@ -108,13 +110,16 @@ public class Game extends JPanel implements ActionListener, MouseListener {
             robot.setX(850);
             player.setX(900); // set new player position
             player.setY(850);
+            messageLabel.setText("Welcome to the second zone, interact with the robot");
         } else if (map.getCurrentSectionIndex() == 1 && player.getY() <= 260 && player.getX() > 900
                 && player.getX() < 950 && !map.getPolice()) {
             map.switchSection(map.getCurrentSectionIndex() + 1); // advance to the next section
+            robot.resetNInteract(); // set robot's interactions to zero for the new map
             robot.setY(710); // set robot's new position in the map
             robot.setX(610);
             player.setX(800); // set player's new position
             player.setY(600);
+            messageLabel.setText("You entered the bank. Interact with the robot.");
         } else if (map.getCurrentSectionIndex() == 2 && player.getY() <= 200 && player.getX() > 900
                 && player.getX() < 970 && robot.getPasswordFound()) {
             map.switchSection(map.getCurrentSectionIndex() + 1); // move to the vault section

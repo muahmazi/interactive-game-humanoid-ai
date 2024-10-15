@@ -35,48 +35,45 @@ public class Robot implements Drawable {
         switch (locationIndex) {
             case 0:
                 messageLabel.setText(
-                        "Hello! I am Leba, a humanoid robot created to assist anyone. Seeing how you're dressed, you seem to be looking for targets to rob, let's go together and I'll help you! \n");
+                        "<html><div style='text-align: center;'>ROBOT: Hello! I am Leba, a humanoid robot created to assist anyone. <br/>Seeing how you're dressed, you seem to be looking for targets to rob, let's go together and I'll help you! </div></html>");
                 follow = true; // robot starts following the player
                 break;
             case 1:
                 if (nInteract == 0) {
-                    messageLabel.setText("Oh look, the village bank is a great target, let's go rob it!");
+                    messageLabel.setText("ROBOT: Oh look, the village bank is a great target, let's go rob it!");
                     nInteract++; // increment interaction count
                 } else if (nInteract == 1) {
-                    messageLabel.setText("Be careful, there are guards in front of the door, I will help you get rid of them.");
+                    messageLabel.setText("ROBOT: Be careful, there are guards in front of the door, I will help you get rid of them.");
                     nInteract++; // increment interaction count
                 } else if (nInteract == 2) {
                     map.removePolice(); // remove police from the map
                     nInteract++; // increment interaction count
-                }
-                if (nInteract == 3) {
-                    messageLabel.setText("Ok the coast is clear, let's go in");
-                    nInteract = 0; // reset interaction count
+                } else if (nInteract == 3) {
+                    messageLabel.setText("ROBOT: Ok the coast is clear, let's go in");
                 }
                 break;
             case 2:
                 if (nInteract == 0) {
-                    messageLabel.setText("Watch out for the traps, let me point them out to you.");
+                    messageLabel.setText("ROBOT: Watch out for the traps, let me point them out to you.");
                     nInteract++; // increment interaction count
                 } else if (nInteract == 1) {
                     map.setShowTraps(true); // show traps on the map
                     nInteract++; // increment interaction count
                 } else if (nInteract == 2) {
-                    messageLabel.setText("The vault has a password, do you want me to bruteforce it?");
+                    messageLabel.setText("ROBOT: The vault has a password, do you want me to bruteforce it?");
                     nInteract++; // increment interaction count
                 } else if (nInteract == 3) {
                     bruteforce(messageLabel); // bruteforce the password
                     nInteract++; // increment interaction count
                 } else if (nInteract == 4) {
-                    messageLabel.setText("Ok, bruteforce done, let's go in");
-                    nInteract = 0; // reset interaction count
+                    messageLabel.setText("ROBOT: Ok, bruteforce done, let's go in");
                 }
                 break;
             case 3:
                 won = true; // player wins the game
                 break;
             default:
-                messageLabel.setText("Invalid interaction");
+                messageLabel.setText("ROBOT: Invalid interaction");
                 break;
         }
     }
@@ -92,9 +89,8 @@ public class Robot implements Drawable {
                 e.printStackTrace();
             }
         }
-        messageLabel.setText("Found password: " + i); // display found password
+        messageLabel.setText("ROBOT: Found password: " + i); // display found password
         passwordFound = true; // mark password as found
-        return;
     }
 
     public void draw(Graphics2D g, int viewportX, int viewportY, int windowWidth, int windowHeight) {
@@ -123,6 +119,10 @@ public class Robot implements Drawable {
 
     public void setY(int y) {
         this.y = y; // set the y position of the robot
+    }
+
+    public void resetNInteract(){
+        nInteract = 0;
     }
 
     public boolean getPasswordFound() {
