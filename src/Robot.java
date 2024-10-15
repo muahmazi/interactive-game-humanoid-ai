@@ -21,7 +21,19 @@ public class Robot implements Drawable {
         }
     }
 
-    public void draw(Graphics2D g, int viewportX, int viewportY) {
-        g.drawImage(image, x - viewportX, y - viewportY, image.getWidth() / 10, image.getHeight() / 10, null);
+    public void draw(Graphics2D g, int viewportX, int viewportY, int windowWidth, int windowHeight) {
+        g.drawImage(image, x - viewportX, y - viewportY, image.getWidth(), image.getHeight(), null);
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public BufferedImage getImage() {
+        return image;
     }
 }
