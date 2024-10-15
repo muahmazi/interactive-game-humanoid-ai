@@ -6,30 +6,35 @@ public class Map implements Drawable {
     private ArrayList<BufferedImage> mapSections; // Array of map images
     private int currentSectionIndex; // Index to track which map section is currently showing
     private ArrayList<Barrier> barriers;
+    private ArrayList<Barrier> traps;
+    private boolean showTraps = false;
 
     public static final int VILLAGE = 0;
     public static final int BANK_OUTSIDE = 1;
     public static final int BANK_INSIDE = 2;
     public static final int CAVOU = 3;
+    public static final int END = 4;
 
     public Map(BufferedImage villageImage, BufferedImage bankOutsideImage, BufferedImage bankInsideImage,
-            BufferedImage cavouImage) {
+            BufferedImage cavouImage, BufferedImage victoryImage) {
         // Initialize the mapSections list with the four images
         mapSections = new ArrayList<>();
         mapSections.add(villageImage);
         mapSections.add(bankOutsideImage);
         mapSections.add(bankInsideImage);
         mapSections.add(cavouImage);
+        mapSections.add(victoryImage);
 
         currentSectionIndex = VILLAGE; // Start in the village
 
         barriers = new ArrayList<>();
+        traps = new ArrayList<>();
         setupBarriersForCurrentSection();
     }
 
     public void setupBarriersForCurrentSection() {
         barriers.clear(); // Clear existing barriers
-
+        traps.clear();
         // Set up barriers for the current section
         switch (currentSectionIndex) {
             case VILLAGE:
@@ -40,6 +45,7 @@ public class Map implements Drawable {
                 break;
             case BANK_INSIDE:
                 setupBarriersForBankInside();
+                setupTrapBarriers();
                 break;
             case CAVOU:
                 setupBarriersForCavou();
@@ -50,6 +56,7 @@ public class Map implements Drawable {
     private void setupBarriersForVillage() {
         // Define barriers for the village section
         barriers.add(new Barrier(0, 0, 200, 1000));
+        barriers.add(new Barrier(0, 0, 2000, 1));
         barriers.add(new Barrier(20, 580, 2000, 500));
         barriers.add(new Barrier(0, 0, 800, 100));
         barriers.add(new Barrier(0, 0, 830, 50));
@@ -77,6 +84,7 @@ public class Map implements Drawable {
     private void setupBarriersForBankInside() {
         // Define barriers for the bank inside section
         barriers.add(new Barrier(600, 0, 50, 2000));
+        barriers.add(new Barrier(0, 0, 2000, 180));
         barriers.add(new Barrier(1300, 0, 50, 2000));
         barriers.add(new Barrier(0, 170, 2000, 20));
         barriers.add(new Barrier(0, 750, 2000, 20)); // Example barrier for bank inside
@@ -90,14 +98,41 @@ public class Map implements Drawable {
         barriers.add(new Barrier(0, 750, 2000, 20)); // Example barrier for cavou
     }
 
+    private void setupTrapBarriers() {
+        traps.add(new Barrier(710, 610, 50, 50));
+        traps.add(new Barrier(760, 660, 50, 50));
+        traps.add(new Barrier(760, 510, 50, 50));
+        traps.add(new Barrier(760, 410, 50, 50));
+        traps.add(new Barrier(710, 310, 50, 50));
+        traps.add(new Barrier(860, 510, 50, 50));
+        traps.add(new Barrier(1060, 510, 50, 50));
+        traps.add(new Barrier(1110, 410, 50, 50));
+        traps.add(new Barrier(1060, 310, 50, 50));
+        traps.add(new Barrier(1110, 610, 50, 50));
+        traps.add(new Barrier(1210, 560, 50, 50));
+        traps.add(new Barrier(960, 360, 50, 50));
+        traps.add(new Barrier(810, 260, 50, 50));
+        System.out.println("Number of traps: " + traps.size()); // Debug output
+    }
+
     public void switchSection(int section) {
         if (section >= 0 && section < mapSections.size()) {
             currentSectionIndex = section;
             setupBarriersForCurrentSection(); // Update barriers for the new section
+        } else {
+            System.out.println("debug");
         }
     }
 
     public boolean checkCollision(Rectangle playerBounds) {
+        if (currentSectionIndex == 2) {
+            for (Barrier trap : traps) {
+                if (trap.collidesWith(playerBounds)) {
+                    return true;
+                }
+            }
+        }
+
         for (Barrier barrier : barriers) {
             if (barrier.collidesWith(playerBounds)) {
                 return true;
@@ -115,22 +150,30 @@ public class Map implements Drawable {
             int imgWidth = currentMapImage.getWidth();
             int imgHeight = currentMapImage.getHeight();
 
-            // Calculate the center position to start drawing the image
+            // Center position to start drawing the image
             x = (windowWidth - imgWidth) / 2;
             y = (windowHeight - imgHeight) / 2;
-
         } else {
             x = -viewportX;
             y = -viewportY;
         }
 
-        // Draw the image at the calculated position
+        // Draw the current map image
         g.drawImage(currentMapImage, x, y, null);
 
         // Draw barriers for debugging purposes
         for (Barrier barrier : barriers) {
-            barrier.drawDebug(g, viewportX, viewportY);
+            Color color = new Color(255, 0, 0, 128);
+            barrier.drawDebug(g, viewportX, viewportY, color);
         }
+        if (showTraps) {
+            for (Barrier trap : traps) {
+                Color color = new Color(0, 255, 0, 255); // Fully opaque green
+                trap.drawDebug(g, viewportX, viewportY, color);
+            }
+        }
+        // Draw traps in fully opaque green
+
     }
 
     // Getters for map sections
@@ -156,5 +199,13 @@ public class Map implements Drawable {
 
     public BufferedImage getCavouImage() {
         return mapSections.get(CAVOU);
+    }
+
+    public ArrayList<Barrier> getTraps() {
+        return traps;
+    }
+
+    public void setShowTraps(boolean b) {
+        showTraps = b;
     }
 }
