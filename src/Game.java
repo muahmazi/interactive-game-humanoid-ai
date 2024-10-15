@@ -25,11 +25,12 @@ public class Game extends JPanel implements ActionListener, MouseListener {
             BufferedImage bankOutsideImage = ImageIO.read(new File("src/graphics/banca.png"));
             BufferedImage bankInsideImage = ImageIO.read(new File("src/graphics/entrata banca.png"));
             BufferedImage cavouImage = ImageIO.read(new File("src/graphics/caveau.png"));
+            BufferedImage victoryImage = ImageIO.read(new File("src/graphics/victory.png"));
 
             // Initialize game entities
             player = new Player(playerLeftImage, playerRightImage, 400, 300);
-            robot = new Robot(robotImage, 300, 300);
-            map = new Map(villageImage, bankOutsideImage, bankInsideImage, cavouImage);
+            robot = new Robot(robotImage, 320, 530);
+            map = new Map(villageImage, bankOutsideImage, bankInsideImage, cavouImage, victoryImage);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -38,6 +39,8 @@ public class Game extends JPanel implements ActionListener, MouseListener {
         // Timer for game updates
         timer = new Timer(1000 / 60, this);
         timer.start();
+
+        addMouseListener(this);
 
         // Key listener for movement
         addKeyListener(new KeyAdapter() {
@@ -85,20 +88,30 @@ public class Game extends JPanel implements ActionListener, MouseListener {
         int mapWidth = 0; // Initialize to zero, will be set based on the current map
         int mapHeight = 0;
 
-        if (map.getCurrentSectionIndex() == 0 && player.getY() <= 50) {
+        if (map.getCurrentSectionIndex() == 0 && player.getY() <= 50 && robot.getFollow()) {
             map.switchSection(map.getCurrentSectionIndex() + 1);
             player.setX(800);
             player.setY(600);
+            robot.setY(810);
+            robot.setX(610);
         } else if (map.getCurrentSectionIndex() == 1 && player.getY() <= 260 && player.getX() > 900
                 && player.getX() < 950) {
             map.switchSection(map.getCurrentSectionIndex() + 1);
             player.setX(800);
             player.setY(600);
+            robot.setY(810);
+            robot.setX(610);
         } else if (map.getCurrentSectionIndex() == 2 && player.getY() <= 200 && player.getX() > 900
-                && player.getX() < 970) {
+                && player.getX() < 970 && robot.getPasswordFound()) {
             map.switchSection(map.getCurrentSectionIndex() + 1);
             player.setX(900);
             player.setY(600);
+            robot.setY(910);
+            robot.setX(610);
+            messageLabel.setText("Interact with the robot one more time to end the game.");
+        }
+        if (robot.getWon()) {
+            map.switchSection(map.getCurrentSectionIndex() + 1);
         }
 
         // Get the dimensions of the current map image
@@ -142,26 +155,33 @@ public class Game extends JPanel implements ActionListener, MouseListener {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, getWidth(), getHeight());
-        int windowWidth = getWidth(); // Width of the game window (viewport)
+
+        int windowWidth = getWidth();
         int windowHeight = getHeight();
-        // Draw map and game objects
-        map.draw(g2d, viewportX, viewportY, windowWidth, windowHeight); // Map is drawn first (background)
+
+        // Draw the map first
+        map.draw(g2d, viewportX, viewportY, windowWidth, windowHeight);
         player.draw(g2d, viewportX, viewportY, windowWidth, windowHeight);
         robot.draw(g2d, viewportX, viewportY, windowWidth, windowHeight);
     }
 
     private void interactWithRobot() {
-        JOptionPane.showMessageDialog(this, "You interacted with the robot!");
+        try {
+            robot.interact(map.getCurrentSectionIndex(), messageLabel, map);
+            this.paintComponent(getGraphics());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        int mouseX = e.getX();
-        int mouseY = e.getY();
+        int mouseX = e.getX() + viewportX; // Adjust mouseX for viewportX
+        int mouseY = e.getY() + viewportY; // Adjust mouseY for viewportY
 
-        // Controlla se il clic è all'interno dei limiti del robot
-        if (mouseX >= robot.getX() && mouseX <= robot.getX() + robot.getImage().getWidth() / 10 &&
-                mouseY >= robot.getY() && mouseY <= robot.getY() + robot.getImage().getHeight() / 10) {
+        // Check if the click is inside the robot's bounds
+        if (mouseX >= robot.getX() && mouseX <= robot.getX() + robot.getImage().getWidth() &&
+                mouseY >= robot.getY() && mouseY <= robot.getY() + robot.getImage().getHeight()) {
             interactWithRobot();
         }
     }
@@ -202,7 +222,7 @@ public class Game extends JPanel implements ActionListener, MouseListener {
         frame.add(game.getMessageLabel(), BorderLayout.SOUTH);
 
         // Frame settings
-        frame.setSize(2000, 2000);
+        frame.setSize(800, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
