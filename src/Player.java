@@ -7,7 +7,6 @@ public class Player implements Drawable {
     private BufferedImage image;
     private BufferedImage leftImage;
     private BufferedImage rightImage;
-    private boolean movingRight;
 
     public Player(BufferedImage leftImage, BufferedImage rightImage, int startX, int startY) {
         this.x = startX;
@@ -15,7 +14,6 @@ public class Player implements Drawable {
         this.leftImage = leftImage;
         this.rightImage = rightImage;
         this.image = rightImage; // Start facing right
-        this.movingRight = true;
     }
 
     public void move(int dx, int dy) {
@@ -24,7 +22,6 @@ public class Player implements Drawable {
     }
 
     public void switchDirection(boolean right) {
-        this.movingRight = right;
         this.image = right ? rightImage : leftImage;
     }
 

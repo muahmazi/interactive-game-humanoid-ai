@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import javax.imageio.ImageIO;
+import java.io.File;
 
 public class Map implements Drawable {
     private ArrayList<BufferedImage> mapSections; // Array of map images
@@ -9,6 +11,10 @@ public class Map implements Drawable {
     private ArrayList<Barrier> traps;
     private boolean showTraps = false;
 
+    private BufferedImage policeImage;
+    private boolean policePresent = true;
+    private boolean explosionDone = false;
+
     public static final int VILLAGE = 0;
     public static final int BANK_OUTSIDE = 1;
     public static final int BANK_INSIDE = 2;
@@ -16,7 +22,10 @@ public class Map implements Drawable {
     public static final int END = 4;
 
     public Map(BufferedImage villageImage, BufferedImage bankOutsideImage, BufferedImage bankInsideImage,
-            BufferedImage cavouImage, BufferedImage victoryImage) {
+            BufferedImage cavouImage, BufferedImage victoryImage, BufferedImage policeImage) {
+
+        this.policeImage = policeImage;
+
         // Initialize the mapSections list with the four images
         mapSections = new ArrayList<>();
         mapSections.add(villageImage);
@@ -161,11 +170,31 @@ public class Map implements Drawable {
         // Draw the current map image
         g.drawImage(currentMapImage, x, y, null);
 
-        // Draw barriers for debugging purposes
-        for (Barrier barrier : barriers) {
-            Color color = new Color(255, 0, 0, 128);
-            barrier.drawDebug(g, viewportX, viewportY, color);
+        if (currentSectionIndex == BANK_OUTSIDE && policePresent) {
+            g.drawImage(policeImage, 890 - viewportX, 260 - viewportY, null);
+            g.drawImage(policeImage, 940 - viewportX, 260 - viewportY, null);
+        } else if (currentSectionIndex == BANK_OUTSIDE && !policePresent && !explosionDone) {
+            BufferedImage expolosionImage = null;
+            try {
+                expolosionImage = ImageIO.read(new File("src/graphics/explosion.png"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            g.drawImage(expolosionImage, 940 - viewportX, 260 - viewportY, null);
+            g.drawImage(expolosionImage, 940 - viewportX, 260 - viewportY, null);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            explosionDone = true;
         }
+
+        // Draw barriers for debugging purposes
+        // for (Barrier barrier : barriers) {
+        // Color color = new Color(255, 0, 0, 128);
+        // barrier.drawDebug(g, viewportX, viewportY, color);
+        // }
         if (showTraps) {
             for (Barrier trap : traps) {
                 Color color = new Color(0, 255, 0, 255); // Fully opaque green
@@ -179,6 +208,10 @@ public class Map implements Drawable {
     // Getters for map sections
     public BufferedImage getCurrentSectionImage() {
         return mapSections.get(currentSectionIndex);
+    }
+
+    public void removePolice() {
+        this.policePresent = false;
     }
 
     public int getCurrentSectionIndex() {
@@ -207,5 +240,9 @@ public class Map implements Drawable {
 
     public void setShowTraps(boolean b) {
         showTraps = b;
+    }
+
+    public boolean getPolice() {
+        return policePresent;
     }
 }

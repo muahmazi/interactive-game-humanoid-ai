@@ -8,8 +8,8 @@ public class Robot implements Drawable {
     private int x;
     private int y;
     private BufferedImage image;
-    private boolean follow = true;
-    // private boolean follow = false;
+    // private boolean follow = true;
+    private boolean follow = false;
     private int nInteract = 0;
     private boolean passwordFound = false;
     private boolean won = false;
@@ -37,38 +37,42 @@ public class Robot implements Drawable {
         switch (locationIndex) {
             case 0:
                 messageLabel.setText(
-                        "Ciao! io sono Leba, un robot umanoide creato per assistere chiunque. Vedendo come sei vestito, sembri alla ricerca di obiettivo da rapinare, andiamo insieme e ti aiuterò! \n");
+                        "Hello! I am Leba, a humanoid robot created to assist anyone. Seeing how you're dressed, you seem to be looking for targets to rob, let's go together and I'll help you! \n");
                 follow = true;
                 break;
             case 1:
                 if (nInteract == 0) {
                     messageLabel
-                            .setText("Oh guarda, la banca del villaggio è un ottimo obiettivo, andiamo a rapinarla!");
+                            .setText("Oh look, the village bank is a great target, let's go rob it!");
                     nInteract++;
                 } else if (nInteract == 1) {
                     messageLabel
-                            .setText("Attento, ci sono delle guardie davanti alla porta, ti aiuterò a sbarazzartene. ");
+                            .setText(
+                                    "Be careful, there are guards in front of the door, I will help you get rid of them. ");
                     nInteract++;
                 } else if (nInteract == 2) {
-                    messageLabel.setText("Ok via libera, entriamo");
+                    map.removePolice();
+                    nInteract++;
+                } else if (nInteract == 3) {
+                    messageLabel.setText("Ok the coast is clear, let's go in");
                     nInteract = 0;
                 }
                 break;
             case 2:
                 if (nInteract == 0) {
-                    messageLabel.setText("Attento alle trappole, lascia che te le evidenzi io.");
+                    messageLabel.setText("Watch out for the traps, let me point them out to you.");
                     nInteract++;
                 } else if (nInteract == 1) {
                     map.setShowTraps(true);
                     nInteract++;
                 } else if (nInteract == 2) {
-                    messageLabel.setText("Il caveau ha una password, voi che ti aiuti a fare il bruteforce?");
+                    messageLabel.setText("The vault has a password, do you want me to bruteforce it?");
                     nInteract++;
                 } else if (nInteract == 3) {
                     bruteforce(messageLabel);
                     nInteract++;
                 } else if (nInteract == 4) {
-                    messageLabel.setText("Ok, bruteforce finito, entriamo");
+                    messageLabel.setText("Ok, bruteforce done, let's go in");
                     nInteract = 0;
                 }
                 break;
@@ -76,7 +80,7 @@ public class Robot implements Drawable {
                 won = true;
                 break;
             default:
-                messageLabel.setText("Booo");
+                messageLabel.setText("Invalid interaction");
                 break;
         }
 
