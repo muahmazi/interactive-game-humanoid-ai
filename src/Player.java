@@ -32,7 +32,13 @@ public class Player implements Drawable {
         return new Rectangle(x, y, image.getWidth() / 10, image.getHeight() / 10);
     }
 
-    public void draw(Graphics2D g, int viewportX, int viewportY) {
+    public Rectangle getBounds(int dx, int dy) {
+        int width = image.getWidth() / 10; // Scale the player's bounding box as well
+        int height = image.getHeight() / 10;
+        return new Rectangle(x + dx, y + dy, width, height); // New bounds after moving by dx, dy
+    }
+
+    public void draw(Graphics2D g, int viewportX, int viewportY, int windowWidth, int windowHeight) {
         g.drawImage(image, x - viewportX, y - viewportY, image.getWidth() / 10, image.getHeight() / 10, null);
     }
 
@@ -43,5 +49,13 @@ public class Player implements Drawable {
 
     public int getY() {
         return y;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
     }
 }
