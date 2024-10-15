@@ -267,5 +267,10 @@ public class Game extends JPanel implements ActionListener, MouseListener {
         frame.setSize(800, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
+
+        GameMusic gameMusic = new GameMusic();
+        gameMusic.loadMusic("src/music/music-first.wav");
+        // Replace with your file path
+        gameMusic.playMusic();
     }
 }
