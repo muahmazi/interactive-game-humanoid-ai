@@ -192,12 +192,12 @@ public class Map implements Drawable {
 
         // Draw barriers for debugging purposes
         // for (Barrier barrier : barriers) {
-        // Color color = new Color(255, 0, 0, 128);
-        // barrier.drawDebug(g, viewportX, viewportY, color);
+        //     Color color = new Color(255, 0, 0, 128);
+        //     barrier.drawDebug(g, viewportX, viewportY, color);
         // }
         if (showTraps) {
             for (Barrier trap : traps) {
-                Color color = new Color(0, 255, 0, 255); // Fully opaque green
+                Color color = new Color(0, 255, 0, 120); // Fully opaque green
                 trap.drawDebug(g, viewportX, viewportY, color);
             }
         }
