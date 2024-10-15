@@ -65,7 +65,7 @@ public class Game extends JPanel implements ActionListener, MouseListener {
                 }
                 if (!map.checkCollision(player.getBounds(dx, dy))) {
                     player.move(dx, dy);
-                    messageLabel.setText("x:" + player.getX() + " | y:" + player.getY());
+                    // messageLabel.setText("x:" + player.getX() + " | y:" + player.getY());
                 } else {
                     messageLabel.setText("Player is intersecting with barriers");
                 }
@@ -90,24 +90,25 @@ public class Game extends JPanel implements ActionListener, MouseListener {
 
         if (map.getCurrentSectionIndex() == 0 && player.getY() <= 50 && robot.getFollow()) {
             map.switchSection(map.getCurrentSectionIndex() + 1);
-            player.setX(800);
-            player.setY(600);
-            robot.setY(810);
-            robot.setX(610);
+            robot.setY(900);
+            robot.setX(850);
+            player.setX(900);
+            player.setY(850);
         } else if (map.getCurrentSectionIndex() == 1 && player.getY() <= 260 && player.getX() > 900
                 && player.getX() < 950) {
             map.switchSection(map.getCurrentSectionIndex() + 1);
+            robot.setY(710);
+            robot.setX(610);
             player.setX(800);
             player.setY(600);
-            robot.setY(810);
-            robot.setX(610);
+
         } else if (map.getCurrentSectionIndex() == 2 && player.getY() <= 200 && player.getX() > 900
                 && player.getX() < 970 && robot.getPasswordFound()) {
             map.switchSection(map.getCurrentSectionIndex() + 1);
-            player.setX(900);
-            player.setY(600);
             robot.setY(910);
             robot.setX(610);
+            player.setX(900);
+            player.setY(600);
             messageLabel.setText("Interact with the robot one more time to end the game.");
         }
         if (robot.getWon()) {
@@ -152,17 +153,49 @@ public class Game extends JPanel implements ActionListener, MouseListener {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.BLACK);
-        g2d.fillRect(0, 0, getWidth(), getHeight());
 
-        int windowWidth = getWidth();
-        int windowHeight = getHeight();
+        // Check if the player has won the game
+        if (robot.getWon()) {
+            // Clear the screen and show the "YOU WON" message
+            clearScreen(g); // Optional: A method to clear the screen if needed
+            drawWinMessage(g);
+        } else {
+            // Regular game drawing logic
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setColor(Color.BLACK);
+            g2d.fillRect(0, 0, getWidth(), getHeight());
 
-        // Draw the map first
-        map.draw(g2d, viewportX, viewportY, windowWidth, windowHeight);
-        player.draw(g2d, viewportX, viewportY, windowWidth, windowHeight);
-        robot.draw(g2d, viewportX, viewportY, windowWidth, windowHeight);
+            int windowWidth = getWidth();
+            int windowHeight = getHeight();
+
+            // Draw map and other game objects if the game is not won
+            map.draw(g2d, viewportX, viewportY, windowWidth, windowHeight);
+            player.draw(g2d, viewportX, viewportY, windowWidth, windowHeight);
+            robot.draw(g2d, viewportX, viewportY, windowWidth, windowHeight);
+        }
+    }
+
+    // Optional method to clear the screen (set everything to black or another
+    // color)
+    private void clearScreen(Graphics g) {
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, getWidth(), getHeight()); // Fill the whole screen with black
+    }
+
+    // Method to draw the "YOU WON" message
+    private void drawWinMessage(Graphics g) {
+        g.setColor(Color.WHITE); // Set the color for the message
+        g.setFont(new Font("Arial", Font.BOLD, 50)); // Set font size and style
+        FontMetrics metrics = g.getFontMetrics(g.getFont());
+
+        String message = "YOU WON!";
+
+        // Center the message on the screen
+        int x = (getWidth() - metrics.stringWidth(message)) / 2;
+        int y = ((getHeight() - metrics.getHeight()) / 2) + metrics.getAscent();
+
+        g.drawString(message, x, y); // Draw the message on the screen
+        messageLabel.setText("GGs, see how helpfull an AI robot could be?");
     }
 
     private void interactWithRobot() {
