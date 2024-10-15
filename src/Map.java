@@ -1,19 +1,19 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
-import java.io.File;
 
 public class Map implements Drawable {
-    private ArrayList<BufferedImage> mapSections; // Array of map images
-    private int currentSectionIndex; // Index to track which map section is currently showing
+    private ArrayList<BufferedImage> mapSections; // array of map images
+    private int currentSectionIndex; // index to track which map section is currently showing
     private ArrayList<Barrier> barriers;
     private ArrayList<Barrier> traps;
-    private boolean showTraps = false;
+    private boolean showTraps = false; // flag to show traps
 
     private BufferedImage policeImage;
-    private boolean policePresent = true;
-    private boolean explosionDone = false;
+    private boolean policePresent = true; // flag to check if police is present
+    private boolean explosionDone = false; // flag to ensure explosion happens once
 
     public static final int VILLAGE = 0;
     public static final int BANK_OUTSIDE = 1;
@@ -21,12 +21,13 @@ public class Map implements Drawable {
     public static final int CAVOU = 3;
     public static final int END = 4;
 
+    // constructor to initialize the map images and setup the first section
     public Map(BufferedImage villageImage, BufferedImage bankOutsideImage, BufferedImage bankInsideImage,
             BufferedImage cavouImage, BufferedImage victoryImage, BufferedImage policeImage) {
 
         this.policeImage = policeImage;
 
-        // Initialize the mapSections list with the four images
+        // initialize the mapSections list with the four images
         mapSections = new ArrayList<>();
         mapSections.add(villageImage);
         mapSections.add(bankOutsideImage);
@@ -34,17 +35,19 @@ public class Map implements Drawable {
         mapSections.add(cavouImage);
         mapSections.add(victoryImage);
 
-        currentSectionIndex = VILLAGE; // Start in the village
+        currentSectionIndex = VILLAGE; // start in the village
 
         barriers = new ArrayList<>();
         traps = new ArrayList<>();
-        setupBarriersForCurrentSection();
+        setupBarriersForCurrentSection(); // setup barriers for the initial section
     }
 
+    // method to setup barriers for the current map section
     public void setupBarriersForCurrentSection() {
-        barriers.clear(); // Clear existing barriers
-        traps.clear();
-        // Set up barriers for the current section
+        barriers.clear(); // clear existing barriers
+        traps.clear(); // clear traps
+
+        // set up barriers based on the current section
         switch (currentSectionIndex) {
             case VILLAGE:
                 setupBarriersForVillage();
@@ -54,7 +57,7 @@ public class Map implements Drawable {
                 break;
             case BANK_INSIDE:
                 setupBarriersForBankInside();
-                setupTrapBarriers();
+                setupTrapBarriers(); // add traps in the bank inside section
                 break;
             case CAVOU:
                 setupBarriersForCavou();
@@ -62,8 +65,8 @@ public class Map implements Drawable {
         }
     }
 
+    // method to define barriers for the village section
     private void setupBarriersForVillage() {
-        // Define barriers for the village section
         barriers.add(new Barrier(0, 0, 200, 1000));
         barriers.add(new Barrier(0, 0, 2000, 1));
         barriers.add(new Barrier(20, 580, 2000, 500));
@@ -79,34 +82,34 @@ public class Map implements Drawable {
         barriers.add(new Barrier(900, 0, 1000, 50));
     }
 
+    // method to define barriers for the bank outside section
     private void setupBarriersForBankOutside() {
-        // Define barriers for the bank outside section
         barriers.add(new Barrier(100, 100, 500, 2000));
         barriers.add(new Barrier(100, 0, 2000, 150));
         barriers.add(new Barrier(1200, 100, 500, 2000));
         barriers.add(new Barrier(0, 910, 2000, 50));
         barriers.add(new Barrier(500, 500, 100, 100));
         barriers.add(new Barrier(750, 500, 500, 100));
-        // outside
     }
 
+    // method to define barriers for the bank inside section
     private void setupBarriersForBankInside() {
-        // Define barriers for the bank inside section
         barriers.add(new Barrier(600, 0, 50, 2000));
         barriers.add(new Barrier(0, 0, 2000, 180));
         barriers.add(new Barrier(1300, 0, 50, 2000));
         barriers.add(new Barrier(0, 170, 2000, 20));
-        barriers.add(new Barrier(0, 750, 2000, 20)); // Example barrier for bank inside
+        barriers.add(new Barrier(0, 750, 2000, 20));
     }
 
+    // method to define barriers for the cavou section
     private void setupBarriersForCavou() {
-        // Define barriers for the cavou section
         barriers.add(new Barrier(600, 0, 50, 2000));
         barriers.add(new Barrier(1300, 0, 50, 2000));
         barriers.add(new Barrier(0, 170, 2000, 20));
-        barriers.add(new Barrier(0, 750, 2000, 20)); // Example barrier for cavou
+        barriers.add(new Barrier(0, 750, 2000, 20));
     }
 
+    // method to define trap barriers for the bank inside section
     private void setupTrapBarriers() {
         traps.add(new Barrier(710, 610, 50, 50));
         traps.add(new Barrier(760, 660, 50, 50));
@@ -121,19 +124,22 @@ public class Map implements Drawable {
         traps.add(new Barrier(1210, 560, 50, 50));
         traps.add(new Barrier(960, 360, 50, 50));
         traps.add(new Barrier(810, 260, 50, 50));
-        System.out.println("Number of traps: " + traps.size()); // Debug output
+        System.out.println("Number of traps: " + traps.size()); // debug output
     }
 
+    // method to switch between map sections
     public void switchSection(int section) {
         if (section >= 0 && section < mapSections.size()) {
             currentSectionIndex = section;
-            setupBarriersForCurrentSection(); // Update barriers for the new section
+            setupBarriersForCurrentSection(); // update barriers for the new section
         } else {
-            System.out.println("debug");
+            System.out.println("debug"); // debug output for invalid section
         }
     }
 
+    // method to check collision with barriers or traps
     public boolean checkCollision(Rectangle playerBounds) {
+        // check collision with traps if in the bank inside section
         if (currentSectionIndex == 2) {
             for (Barrier trap : traps) {
                 if (trap.collidesWith(playerBounds)) {
@@ -142,14 +148,16 @@ public class Map implements Drawable {
             }
         }
 
+        // check collision with regular barriers
         for (Barrier barrier : barriers) {
             if (barrier.collidesWith(playerBounds)) {
                 return true;
             }
         }
-        return false;
+        return false; // no collision detected
     }
 
+    // method to draw the current map section, barriers, and other elements
     public void draw(Graphics2D g, int viewportX, int viewportY, int windowWidth, int windowHeight) {
         BufferedImage currentMapImage = mapSections.get(currentSectionIndex);
 
@@ -159,7 +167,7 @@ public class Map implements Drawable {
             int imgWidth = currentMapImage.getWidth();
             int imgHeight = currentMapImage.getHeight();
 
-            // Center position to start drawing the image
+            // center position to start drawing the image
             x = (windowWidth - imgWidth) / 2;
             y = (windowHeight - imgHeight) / 2;
         } else {
@@ -167,9 +175,10 @@ public class Map implements Drawable {
             y = -viewportY;
         }
 
-        // Draw the current map image
+        // draw the current map image
         g.drawImage(currentMapImage, x, y, null);
 
+        // draw police or explosion if in the bank outside section
         if (currentSectionIndex == BANK_OUTSIDE && policePresent) {
             g.drawImage(policeImage, 890 - viewportX, 260 - viewportY, null);
             g.drawImage(policeImage, 940 - viewportX, 260 - viewportY, null);
@@ -183,35 +192,29 @@ public class Map implements Drawable {
             g.drawImage(expolosionImage, 940 - viewportX, 260 - viewportY, null);
             g.drawImage(expolosionImage, 940 - viewportX, 260 - viewportY, null);
             try {
-                Thread.sleep(1000);
+                Thread.sleep(1000); // pause for 1 second to simulate explosion effect
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            explosionDone = true;
+            explosionDone = true; // ensure explosion only happens once
         }
 
-        // Draw barriers for debugging purposes
-        // for (Barrier barrier : barriers) {
-        //     Color color = new Color(255, 0, 0, 128);
-        //     barrier.drawDebug(g, viewportX, viewportY, color);
-        // }
+        // draw traps if showTraps is enabled
         if (showTraps) {
             for (Barrier trap : traps) {
-                Color color = new Color(0, 255, 0, 120); // Fully opaque green
-                trap.drawDebug(g, viewportX, viewportY, color);
+                Color color = new Color(0, 255, 0, 120); // fully opaque green for traps
+                trap.drawDebug(g, viewportX, viewportY, color); // draw traps
             }
         }
-        // Draw traps in fully opaque green
-
     }
 
-    // Getters for map sections
+    // getters for various map sections and attributes
     public BufferedImage getCurrentSectionImage() {
         return mapSections.get(currentSectionIndex);
     }
 
     public void removePolice() {
-        this.policePresent = false;
+        this.policePresent = false; // remove police from the map
     }
 
     public int getCurrentSectionIndex() {
@@ -235,14 +238,14 @@ public class Map implements Drawable {
     }
 
     public ArrayList<Barrier> getTraps() {
-        return traps;
+        return traps; // return the traps list
     }
 
     public void setShowTraps(boolean b) {
-        showTraps = b;
+        showTraps = b; // set the flag to show or hide traps
     }
 
     public boolean getPolice() {
-        return policePresent;
+        return policePresent; // check if police are present
     }
 }
