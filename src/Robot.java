@@ -53,7 +53,8 @@ public class Robot implements Drawable {
                 } else if (nInteract == 2) {
                     map.removePolice();
                     nInteract++;
-                } else if (nInteract == 3) {
+                }
+                if (nInteract == 3) {
                     messageLabel.setText("Ok the coast is clear, let's go in");
                     nInteract = 0;
                 }
